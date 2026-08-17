@@ -1,11 +1,7 @@
 # User: First complete 0_download_GEO_data.R. This script relies on the downloaded data
 
 # Load libraries
-library(dplyr)
 library(tdhia)
-library(qvalue)
-library(tibble)
-
 
 # CRITICAL NOTE:
 # The original preprocessing was performed on the complete cohort (approximately 1,900 samples).
