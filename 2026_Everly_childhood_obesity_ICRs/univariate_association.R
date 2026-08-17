@@ -47,6 +47,8 @@ study_data_late_childhood <- study_data %>%
 # Categorical example: maternal smoking
 # Model for sustained obesity vs. non-obese
 # ----------------------------------------------
+study_data_birth_sustained_vs_non <- study_data_birth %>%
+  filter(child_obesity == "Sustained obesity" | child_obesity == "Non-obese")
 table(study_data_birth_sustained_vs_non$child_obesity, study_data_birth_sustained_vs_non$mat_smoking) #sample sizes
 univariate_model_maternal_smoking_sustained <- glm(child_obesity ~ mat_smoking, data = study_data_birth_sustained_vs_non, family=binomial)
 summary(univariate_model_maternal_smoking_sustained) # gives estimates and p-values
