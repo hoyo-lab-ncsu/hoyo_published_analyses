@@ -11,7 +11,8 @@ library(tibble)
 # ============================================================================================================
 # If starting with pre-processed CpG beta dataframe:
 predictor_cpg_df <- processed_cpg_df_umbilical %>%
-  rename(sample = Sample.name)
+  rename(sample = `Sample name`)
+predictor_cpg_df <- as.data.frame(predictor_cpg_df)
 row.names(predictor_cpg_df) <- predictor_cpg_df$sample # rename the rownames to the sample name
 
 # 2. Load ICR map
@@ -23,19 +24,29 @@ icr_mapping_unique <- icr_mapping %>% # Some CpGs have >1 probe so they are repe
 
 # 3. Prepare study data
 # ============================================================================================================
-# Rename columns to easier variable names to work with
+# Separate out the sample name as its own column
 study_data <- study_data %>%
-  rename(child_obesity = Childhood.Obesity.Status,
-         mat_smoking = Maternal.Smoking,
-         mat_obesity = Maternal.Obesity,
-         mat_education = Maternal.Education,
-         mat_race_eth = Maternal.Race.Ethnicity,
-         breastfeeding = Ever.Breastfed,
-         child_sex = Baby.Sex,
-         child_age = Child.age.at.sample.collection..months.,
-         sample = X.Sample.name..from.processed.data.table.,
-         tissue = X..tissue
-  )
+  tidyr::separate(
+    `title`,
+    into = c("title", "sample"),
+    sep = " \\[",
+    extra = "merge"
+  ) %>%
+  mutate(sample = stringr::str_remove(sample, "\\]$"))
+
+# Rename columns to easier variable names to work with and select only variables relevant to analysis
+study_data <- study_data %>%
+  rename(child_obesity = `childhood obesity status:ch1`,
+         mat_smoking = `maternal smoking:ch1`,
+         mat_obesity = `maternal obesity:ch1`,
+         mat_education = `maternal education:ch1`,
+         mat_race_eth = `maternal race/ethnicity:ch1`,
+         breastfeeding = `ever breastfed:ch1`,
+         child_sex = `baby sex:ch1`,
+         child_age = `child age at sample collection (months):ch1`,
+         tissue = `tissue:ch1`) %>%
+  select(title, sample, child_obesity, mat_smoking, mat_obesity, mat_education,
+         mat_race_eth, breastfeeding, child_sex, child_age, tissue)
 
 # Ensure all categorical variables are factors
 study_data <- study_data %>%
@@ -187,4 +198,4 @@ intermediate_results_df <- merge(results_cpg_sustained_obesity,
 final_results_sustained_obesity_birth <- merge(intermediate_results_df,
                                                skat_sustained_obesity, by.x="ICR_id", by.y="icr_id")
 
-  
+
