@@ -8,17 +8,46 @@ library(tdhia)
 # Probe filtering (removal of probes with detection p-values failing in >10% of samples) and sample
 # filtering (removal of samples with >5% failed probes) were therefore based on the full dataset.
 
-# To protect participant privacy and minimize data sharing, the repository includes only the IDAT files 
-# for the 586 participants included in the present analysis. Consequently, rerunning the preprocessing 
-# pipeline from the shared IDAT files will result in slightly different probe and sample filtering because 
+# To protect participant privacy and minimize data sharing, the repository includes only the IDAT files
+# for the 586 participants included in the present analysis. Consequently, rerunning the preprocessing
+# pipeline from the shared IDAT files will result in slightly different probe and sample filtering because
 # the percentage-based thresholds are calculated using a different number of samples.
 
-# The processed CpG beta matrix used in the manuscript is provided so that all downstream analyses reproduce 
+# The processed CpG beta matrix used in the manuscript is provided so that all downstream analyses reproduce
 # the published results exactly.
 
 
 # Process IDAT Files (please read CRITICAL NOTE first)
 # ============================================================================================================
+# Decompress .gz files
+idat_gz_files <- list.files(
+  idat_dir_path,
+  pattern = "\\.idat\\.gz$",
+  full.names = TRUE,
+  recursive = TRUE
+)
+
+for (f in idat_gz_files) {
+  R.utils::gunzip(f, remove = TRUE, overwrite = TRUE)
+}
+
+# Remove GSM#### from beginning of IDAT file names
+idat_files <- list.files(
+  idat_dir_path,
+  pattern = "\\.idat$",
+  full.names = TRUE,
+  recursive = TRUE
+)
+
+for (f in idat_files) {
+  new_name <- sub(
+    "^GSM[0-9]+_",
+    "",
+    basename(f)
+  )
+  file.rename(f, file.path(dirname(f), new_name))
+}
+
 # a)  Load IDATS and convert to probe beta matrix
 # Must provide path where the IDAT files are located on your computer.
 probe_beta <- load_idata_to_probes(idat_dir_paths = idat_dir_path,
@@ -41,7 +70,7 @@ filt_probe_beta <- filter_probes(probe_beta = probe_beta,
                                  discard_failed_patients = TRUE)
 
 # c)  Convert probe beta matrix to a cpg beta matrix
-cpg_beta_test <- convert_probes_to_cpgs(probe_beta= filt_probe_beta,
+cpg_beta <- convert_probes_to_cpgs(probe_beta= filt_probe_beta,
                                         quantile_norm = FALSE,
                                         discard_unmapped_cpgs = TRUE,
                                         discard_non_icr_cpgs = TRUE,
@@ -50,4 +79,4 @@ cpg_beta_test <- convert_probes_to_cpgs(probe_beta= filt_probe_beta,
                                         db_flag = FALSE)
 
 
-predictor_cpg_df <- as.data.frame(t(cpg_beta_test[["cpg_beta_df"]]))
+predictor_cpg_df <- as.data.frame(t(cpg_beta[["cpg_beta_df"]]))
