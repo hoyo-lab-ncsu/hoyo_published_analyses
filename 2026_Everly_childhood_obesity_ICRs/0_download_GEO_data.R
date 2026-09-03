@@ -11,7 +11,7 @@ geo_id <- "GSE334366"
 tmp <- file.path(tempdir(), geo_id)
 dir.create(tmp, showWarnings = FALSE, recursive = TRUE)
 
-# Download Study Metadata
+# Download GEO study metadata
 gset <- getGEO(
   geo_id,
   GSEMatrix = TRUE
@@ -35,4 +35,4 @@ raw_tar <- list.files(tmp, pattern = "GSE334366_RAW\\.tar$", recursive = TRUE, f
 idat_dir_path <- file.path(tmp, "IDATs")
 dir.create(idat_dir_path, showWarnings = FALSE, recursive = TRUE)
 untar(raw_tar, exdir = idat_dir_path)
-idat_files <- list.files(idat_dir_path, pattern = "\\.idat(\\.gz)?$", recursive = TRUE, full.names = TRUE)
+

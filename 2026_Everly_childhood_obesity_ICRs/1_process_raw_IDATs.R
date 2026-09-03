@@ -20,24 +20,14 @@ library(tdhia)
 # Process IDAT Files (please read CRITICAL NOTE first)
 # ============================================================================================================
 # Decompress .gz files
-idat_gz_files <- list.files(
-  idat_dir_path,
-  pattern = "\\.idat\\.gz$",
-  full.names = TRUE,
-  recursive = TRUE
-)
+idat_gz_files <- list.files(idat_dir_path, pattern = "\\.idat\\.gz$", full.names = TRUE, recursive = TRUE)
 
 for (f in idat_gz_files) {
   R.utils::gunzip(f, remove = TRUE, overwrite = TRUE)
 }
 
 # Remove GSM#### from beginning of IDAT file names
-idat_files <- list.files(
-  idat_dir_path,
-  pattern = "\\.idat$",
-  full.names = TRUE,
-  recursive = TRUE
-)
+idat_files <- list.files(idat_dir_path, pattern = "\\.idat$", full.names = TRUE, recursive = TRUE)
 
 for (f in idat_files) {
   new_name <- sub(
